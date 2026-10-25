@@ -1,0 +1,10 @@
+.venv
+__pycache__/
+.idea
+*.db
+identifier.sqlite
+demo_*.py
+# Aider configuration and history files
+.aider*
+launch.json
+settings.json
