@@ -1,3 +1,5 @@
+import flet as ft
+def main(page: ft.Page):
+    page.add(ft.Text("Hello, World!"))
 
-if __name__ == "__main__":
-    ft.run(target=main)
+ft.run(main)
