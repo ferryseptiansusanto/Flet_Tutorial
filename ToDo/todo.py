@@ -10,9 +10,11 @@ class Task(ft.Column):
     on_status_change: Callable[[], None] = field(default=lambda: None)
     on_delete: Callable[["Task"], None] = field(default=lambda task: None)
 
-
     def init(self):
-        self.display_task = ft.Checkbox(value=False, label=self.task_name)
+        self.completed = False
+        self.display_task = ft.Checkbox(
+            value=False, label=self.task_name, on_change=self.status_changed
+        )
         self.edit_name = ft.TextField(expand=1)
 
         self.display_view = ft.Row(
@@ -66,20 +68,20 @@ class Task(ft.Column):
         self.edit_view.visible = False
         self.update()
 
-    def delete_clicked(self, e):
-        self.on_task_delete(self)
     def status_changed(self, e):
         self.completed = self.display_task.value
-        self.task_status_change()
+        self.on_status_change()
+
+    def delete_clicked(self, e):
+        self.on_delete(self)
 
 
 @ft.control
 class TodoApp(ft.Column):
     # application's root control is a Column containing all other controls
     def init(self):
-        self.new_task = ft.TextField(hint_text="What needs to be done?", expand=True)
+        self.new_task = ft.TextField(hint_text="Whats needs to be done?", expand=True)
         self.tasks = ft.Column()
-        
 
         self.filter = ft.TabBar(
             scrollable=False,
@@ -96,9 +98,8 @@ class TodoApp(ft.Column):
             on_change=lambda e: self.update(),
             content=self.filter,
         )
-        
+
         self.width = 600
-        
         self.controls = [
             ft.Row(
                 controls=[
@@ -108,14 +109,14 @@ class TodoApp(ft.Column):
                     ),
                 ],
             ),
-            self.tasks,
+            ft.Column(
+                spacing=25,
+                controls=[
+                    self.filter_tabs,
+                    self.tasks,
+                ],
+            ),
         ]
-
-    def tabs_changed(self, e):
-        self.update()
-
-    def task_status_change(self, e):
-        self.update()
 
     def add_clicked(self, e):
         task = Task(
@@ -127,6 +128,9 @@ class TodoApp(ft.Column):
         self.new_task.value = ""
         self.update()
 
+    def task_status_change(self):
+        self.update()
+
     def task_delete(self, task):
         self.tasks.controls.remove(task)
         self.update()
@@ -136,9 +140,12 @@ class TodoApp(ft.Column):
         for task in self.tasks.controls:
             task.visible = (
                 status == "all"
-                or (status == "active" and task.completed == False)
+                or (status == "active" and not task.completed)
                 or (status == "completed" and task.completed)
             )
+
+    def tabs_changed(self, e):
+        self.update()
 
 
 def main(page: ft.Page):
