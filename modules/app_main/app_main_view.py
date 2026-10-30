@@ -15,6 +15,7 @@ class AppMainView(ft.Row):
             destinations=[
                 ft.NavigationRailDestination(icon=ft.Icons.CALCULATE_OUTLINED, selected_icon=ft.Icons.CALCULATE, label="Kalkulator"),
                 ft.NavigationRailDestination(icon=ft.Icons.CHECKLIST_OUTLINED, selected_icon=ft.Icons.CHECKLIST, label="To-Do List"),
+                ft.NavigationRailDestination(icon=ft.Icons.CHECKLIST_OUTLINED, selected_icon=ft.Icons.CHECKLIST, label="Chat Room"),
             ],
             on_change=lambda e: self.logic.set_nav_index(e.control.selected_index),
         )
